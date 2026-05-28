@@ -81,7 +81,7 @@ Stores values entered per step per submission, enabling clean step-by-step parti
 
    ## Live Demo
 
-## Frontend Deployment:
+Frontend Deployment:
 https://stepper-form-ruddy.vercel.app/
 
 Backend API Deployment:
