@@ -1,0 +1,19 @@
+{
+  "name": "stepper-form-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Stepper Form application",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "mongodb": "^7.2.0",
+    "mongoose": "^8.24.0"
+  }
+}
