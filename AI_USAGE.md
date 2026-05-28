@@ -64,6 +64,12 @@ for unsaved changes. I added a `cancel` event listener with
 AI defaulted to port 5000 which conflicts with AirPlay on macOS. Changed
 backend to 5001 and updated the Axios base URL in `frontend/src/api/index.js`.
 
+**6. Frontend Empty Draft Filtering:**
+AI's original listing query returned every draft submission, meaning that simply opening and closing the form without typing anything cluttered the dashboard with empty draft cards. I added frontend-side logic in `SubmissionList.jsx` to filter out any draft submissions that do not have at least one completed step (`completedSteps.length === 0`), keeping the dashboard clean.
+
+**7. Form Creation Loading State (`isCreating`):**
+When starting a new form, there is a delay before the modal opens. Without feedback, clicking the creation button multiple times repeatedly would trigger multiple API creation calls, resulting in several duplicate empty draft entries in the database. I implemented the `isCreating` state to disable the button and show `"Creating a new form..."` alongside an inline spinner to prevent double-clicks and reassure the user during form loading.
+
 ---
 
 ## What AI Got Wrong

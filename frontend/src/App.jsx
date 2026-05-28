@@ -7,6 +7,7 @@ function App() {
   const [submissions, setSubmissions] = useState([]);
   const [formConfigs, setFormConfigs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   
   const [activeSubmissionId, setActiveSubmissionId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +32,7 @@ function App() {
   }, []);
 
   const handleCreateNew = async (configId) => {
+    setIsCreating(true);
     try {
       const response = await createSubmission(configId);
       const newSub = response.data;
@@ -44,6 +46,8 @@ function App() {
     } catch (error) {
       console.error('Error creating new submission:', error);
       alert('Failed to start new submission. Is the backend running?');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -55,6 +59,7 @@ function App() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setActiveSubmissionId(null);
+    fetchData(); // Refresh list to automatically hide any empty drafts
   };
 
   return (
@@ -66,6 +71,7 @@ function App() {
           onCreateNew={handleCreateNew}
           onOpen={handleOpenModal}
           loading={loading}
+          isCreating={isCreating}
         />
       </main>
 

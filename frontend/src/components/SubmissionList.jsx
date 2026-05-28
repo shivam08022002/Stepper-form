@@ -15,7 +15,13 @@ const formatDate = (dateStr) => {
   return `${formattedDate}, ${hours}:${minutes}${ampm}`; // "May 25, 2026, 1:37pm"
 };
 
-const SubmissionList = ({ submissions, formConfigs, onCreateNew, onOpen, loading }) => {
+const SubmissionList = ({ submissions, formConfigs, onCreateNew, onOpen, loading, isCreating }) => {
+  // Filter out draft submissions that have no input/progress (no completed steps)
+  const visibleSubmissions = submissions.filter(sub => {
+    if (sub.status === 'completed') return true;
+    return sub.completedSteps && sub.completedSteps.length > 0;
+  });
+
   // Find "Wellness Intake" config to provide a direct starter action
   const wellnessConfig = formConfigs.find(c => c.title === 'Wellness Intake') || formConfigs[0];
 
@@ -30,12 +36,22 @@ const SubmissionList = ({ submissions, formConfigs, onCreateNew, onOpen, loading
           <button 
             className="btn-primary start-new-btn"
             onClick={() => onCreateNew(wellnessConfig._id)}
+            disabled={isCreating}
           >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" className="btn-icon">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Start Wellness Intake
+            {isCreating ? (
+              <>
+                <div className="spinner-mini" style={{ marginRight: '8px' }} />
+                Creating a new form...
+              </>
+            ) : (
+              <>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" className="btn-icon">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Start Wellness Intake
+              </>
+            )}
           </button>
         )}
       </header>
@@ -45,7 +61,7 @@ const SubmissionList = ({ submissions, formConfigs, onCreateNew, onOpen, loading
           <div className="spinner" />
           <p>Fetching your submissions...</p>
         </div>
-      ) : submissions.length === 0 ? (
+      ) : visibleSubmissions.length === 0 ? (
         <div className="empty-dashboard-card">
           <div className="empty-icon">
             <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -57,7 +73,7 @@ const SubmissionList = ({ submissions, formConfigs, onCreateNew, onOpen, loading
         </div>
       ) : (
         <div className="submissions-grid">
-          {submissions.map((sub) => {
+          {visibleSubmissions.map((sub) => {
             const config = sub.configId;
             const title = config?.title || 'Intake Form';
             const totalSteps = config?.steps?.length || 0;
