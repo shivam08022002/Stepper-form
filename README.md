@@ -78,3 +78,12 @@ Stores values entered per step per submission, enabling clean step-by-step parti
    npm run dev
    ```
    *The frontend will run on [http://localhost:5173](http://localhost:5173).*
+
+   ## Live Demo
+
+Frontend Deployment:
+https://stepper-form-ruddy.vercel.app/
+
+Backend API Deployment:
+https://stepper-form.onrender.com/
+
