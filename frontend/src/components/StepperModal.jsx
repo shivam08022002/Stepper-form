@@ -25,6 +25,25 @@ const StepperModal = ({ isOpen, submissionId, onClose, onRefresh }) => {
   // Bind our custom unsaved changes hook
   const { isDirty } = useUnsavedChanges(savedStepAnswers, currentStepAnswers);
 
+  // Custom confirmation modal state
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    message: '',
+    onConfirm: null
+  });
+
+  const showConfirm = (message, onConfirm) => {
+    setConfirmDialog({
+      isOpen: true,
+      message,
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        onConfirm();
+      }
+    });
+  };
+
+
   // Sync open/close of native dialog
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -119,8 +138,10 @@ const StepperModal = ({ isOpen, submissionId, onClose, onRefresh }) => {
       return;
     }
     if (isDirty) {
-      const leave = window.confirm('You have unsaved changes. Leave anyway?');
-      if (!leave) return;
+      showConfirm('You have unsaved changes. Leave anyway?', () => {
+        changeActiveStep(idx);
+      });
+      return;
     }
     changeActiveStep(idx);
   };
@@ -135,8 +156,10 @@ const StepperModal = ({ isOpen, submissionId, onClose, onRefresh }) => {
   // Close modal request (guards against unsaved state)
   const handleRequestClose = () => {
     if (isDirty) {
-      const leave = window.confirm('You have unsaved changes. Leave anyway?');
-      if (!leave) return;
+      showConfirm('You have unsaved changes. Leave anyway?', () => {
+        onClose();
+      });
+      return;
     }
     onClose();
   };
@@ -151,8 +174,10 @@ const StepperModal = ({ isOpen, submissionId, onClose, onRefresh }) => {
   const handleBack = () => {
     if (currentStepIdx > 0) {
       if (isDirty) {
-        const leave = window.confirm('You have unsaved changes in this step. Go back anyway?');
-        if (!leave) return;
+        showConfirm('You have unsaved changes in this step. Go back anyway?', () => {
+          changeActiveStep(currentStepIdx - 1);
+        });
+        return;
       }
       changeActiveStep(currentStepIdx - 1);
     }
@@ -281,7 +306,11 @@ const StepperModal = ({ isOpen, submissionId, onClose, onRefresh }) => {
       onClick={handleDialogClick}
       onCancel={(e) => {
         e.preventDefault();
-        handleRequestClose();
+        if (confirmDialog.isOpen) {
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        } else {
+          handleRequestClose();
+        }
       }}
     >
       <div className="stepper-modal-content">
@@ -370,6 +399,30 @@ const StepperModal = ({ isOpen, submissionId, onClose, onRefresh }) => {
           </>
         )}
       </div>
+
+      {confirmDialog.isOpen && (
+        <div className="confirm-overlay" onClick={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-header">
+              <h3>Discard Changes?</h3>
+            </div>
+            <div className="confirm-body">
+              <p>{confirmDialog.message}</p>
+            </div>
+            <div className="confirm-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+              >
+                Cancel
+              </button>
+              <button className="btn-danger" onClick={confirmDialog.onConfirm}>
+                Yes, Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </dialog>
   );
 };

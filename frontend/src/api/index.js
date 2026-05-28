@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: 'https://stepper-form.onrender.com/api',
 });
 
 export const getFormConfigs = () => API.get('/form-configs');
@@ -11,8 +11,8 @@ export const createSubmission = (configId) => API.post('/submissions', { configI
 export const getSubmissions = () => API.get('/submissions');
 export const getSubmission = (id) => API.get(`/submissions/${id}`);
 
-export const saveStepAnswer = (submissionId, stepId, answers, currentStep, draft = false) => 
+export const saveStepAnswer = (submissionId, stepId, answers, currentStep, draft = false) =>
   API.patch(`/submissions/${submissionId}/steps/${stepId}`, { answers, currentStep, draft });
 
-export const completeSubmission = (submissionId) => 
+export const completeSubmission = (submissionId) =>
   API.post(`/submissions/${submissionId}/complete`);
